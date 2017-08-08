@@ -1,0 +1,11 @@
+innerRadius
+outerRadius
+endAngle
+startAngle
+padAngle
+value  function(d) {
+                        return option.value(d);
+                    }
+name
+event
+

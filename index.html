@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ch">
+
+<head>
+    <title>d3_lh</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- <link href="css/style.css" rel="stylesheet"> -->
+    <script src="./library/d3.js"></script>
+    <script src="./module/d3_lh.js"></script>
+</head>
+
+<body>
+    <div id="test">
+
+    </div>
+    <div id="test2">
+
+    </div>
+</body>
+
+<script>
+    var data = [
+
+        ["A", 1],
+        ["b", 1],
+        ["c", 1],
+        ["d", 1],
+        ["r", 1],
+        ["f", 1],
+        ["s", 1]
+    ];
+    var data2 = [{
+        "name": "RU",
+        "size": 2
+    }, {
+        "name": "FR",
+        "size": 13
+    }, {
+        "name": "CN",
+        "size": 18
+    }, {
+        "name": "VG",
+        "size": 1
+    }, {
+        "name": "DE",
+        "size": 3
+    }, {
+        "name": "JP",
+        "size": 1
+    }, {
+        "name": "US",
+        "size": 215
+    }, {
+        "name": "PL",
+        "size": 1
+    }]
+    var a = d3.lh.chart("test");
+    a.Quickly("pie")
+        .Data(data)
+        .Draw()
+    var b = d3.lh.chart("test2")
+        .Quickly("pie")
+        .Option({
+            value: function(d) {
+                return d.size
+            },
+            name: function(d) {
+                return d.name
+            }
+        })
+        .Data(data2)
+        .Draw()
+</script>
+
+</html>
