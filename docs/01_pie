@@ -1,8 +1,11 @@
+pie:
+pie:
 innerRadius
 outerRadius
 endAngle
 startAngle
 padAngle
+sequence
 value  function(d) {
                         return option.value(d);
                     }

@@ -5,9 +5,58 @@
     <title>d3_lh</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- <link href="css/style.css" rel="stylesheet"> -->
+    <link href="./module/d3_lh.css" rel="stylesheet" type="text/css">
     <script src="./library/d3.js"></script>
     <script src="./module/d3_lh.js"></script>
+    <style>
+        .a {
+            display: flex;
+            background: red;
+            height: 500px;
+            width: 100%;
+            flex-direction: column;
+            /* align-items: center; */
+            justify-content: space-between;
+        }
+        
+        .top {
+            background: orange;
+            width: 100%;
+            height: 70px;
+        }
+        
+        .content {
+            flex: auto;
+            background: yellow;
+            width: 100%;
+            height: calc(100% - 80px);
+            /* margin-top: 1px; */
+            display: flex;
+            flex-direction: row-reverse;
+        }
+        
+        .chart {
+            background: green;
+            flex: auto;
+            /* height: 1 */
+        }
+        
+        .legend {
+            background: blue;
+            height: 100%;
+            width: 100px;
+        }
+        /* #a {
+            width: 300px;
+            height: 300px;
+        }
+        
+        #test2,
+        #test {
+            width: 300px;
+            height: 300px;
+        }*/
+    </style>
 </head>
 
 <body>
@@ -16,6 +65,20 @@
     </div>
     <div id="test2">
 
+    </div>
+    <div class="a">
+        <div class="top">
+
+        </div>
+        <div class="content">
+            <div class="legend">
+
+            </div>
+            <div class="chart">
+
+            </div>
+
+        </div>
     </div>
 </body>
 
@@ -62,11 +125,16 @@
     var b = d3.lh.chart("test2")
         .Quickly("pie")
         .Option({
-            value: function(d) {
-                return d.size
+            pie: {
+                value: function(d) {
+                    return d.size
+                },
+                name: function(d) {
+                    return d.name
+                }
             },
-            name: function(d) {
-                return d.name
+            legend: {
+                position: "w"
             }
         })
         .Data(data2)
