@@ -60,10 +60,10 @@
 </head>
 
 <body>
-    <div id="test">
+    <div id="test" style="height: 400px">
 
     </div>
-    <div id="test2">
+    <div id="test2" style="height:400px">
 
     </div>
     <div class="a">
@@ -121,11 +121,17 @@
     var a = d3.lh.chart("test");
     a.Quickly("pie")
         .Data(data)
+        .Option({
+            pie: {
+                innerRadius: .5
+            }
+        })
         .Draw()
     var b = d3.lh.chart("test2")
         .Quickly("pie")
         .Option({
             pie: {
+                innerRadius: 20,
                 value: function(d) {
                     return d.size
                 },
@@ -139,6 +145,12 @@
         })
         .Data(data2)
         .Draw()
+    d3.select(window).on('resize', resize);
+
+    function resize() {
+        a.Draw();
+        b.Draw();
+    }
 </script>
 
 </html>

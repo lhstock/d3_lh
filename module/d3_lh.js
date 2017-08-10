@@ -1,13 +1,68 @@
 ! function() {
+
     var lh = d3.lh || {};
+
     lh.version = "1.0.0";
+
     lh.description = "none";
+
     lh.chart = function(id_) {
+
         return lh_chart(id_);
+
+    }
+
+    lh.tip = new component_tooltip();
+
+    function component_tooltip() {
+        var tip = Object.create(lh);
+        // tip.Bind = function() {
+
+        // }
+        // createTagForDom('tool_tip_d3_lh');
+        // tip.dom = d3.selectAll('.tool_tip_d3_lh');
+        tip.dom = d3.select("body")
+            .append("div")
+            .attr("class", "tool_tip_d3_lh")
+            // selectAll(".tool_tip_d3_lh")
+
+        tip.dom = function() {
+            return draw_tip();
+        }();
+
+        /**
+         * dom还未加载会导致失败；因此延迟执行确保tip——div创建；
+         * 
+         * @returns dom
+         */
+        function draw_tip() {
+            var dom = d3.select("body").append('div').attr("class", 'tool_tip_d3_lh');
+
+            if (!!dom.node()) {
+                return dom;
+            } else {
+                setTimeout(draw_tip, 1000);
+            }
+        }
+        tip.Data = function(d) {
+            tip._data = d;
+            return tip;
+        }
+        tip.test = function() {
+            console.log("test");
+        }
+        tip.show = function(name, value) {
+            console.log(name, value)
+        }
+        tip.hiddle = function() {
+            console.log("hiddle")
+        }
+        return tip;
     }
 
     function lh_chart(id_) {
         var _ = Object.create(lh);
+
         var option;
         /**
          * 初始化原型
@@ -43,16 +98,13 @@
                 },
                 event: {
                     "mouseover": function a(d, i) {
-                        // var option = option.pie;
-                        console.log("in", this.option.name(d.data), this.option.value(d.data))
+                        // console.log("in", this.option.name(d.data), this.option.value(d.data))
                     },
                     "mousemove": function(d) {
-                        // var option = option.pie;
-                        console.log("move", this.option.name(d.data), this.option.value(d.data))
+                        // console.log("move", this.option.name(d.data), this.option.value(d.data))
                     },
                     "mouseout": function(d) {
-                        // var option = option.pie;
-                        console.log("out", d)
+                        // console.log("out", d)
                     }
                 }
 
@@ -82,11 +134,13 @@
 
         _.Quickly = function(s) {
             _.quickly = s;
-            // _.option = option[_.quickly];
+
             option = _.option = {}
-            _.option[_.quickly] = Obj[_.quickly];
-            _.option["title"] = Obj.title;
-            _.option["legend"] = Obj.legend;
+            var obj = deepCopy(Obj);
+
+            _.option[_.quickly] = obj[_.quickly];
+            _.option["title"] = obj.title;
+            _.option["legend"] = obj.legend;
             return _;
         }
 
@@ -113,9 +167,9 @@
 
         function draw_() {
             draw_div()
-            var pie = new component_pie();
-            pie.Option(_.option.pie)
-            pie.Draw()
+            _.component.pie = _.component.pie || new component_pie();
+            _.component.pie.Option(_.option.pie)
+            _.component.pie.Draw()
         }
 
         function draw_div() {
@@ -151,7 +205,7 @@
                 .attr("class", _.tag.c.topDiv)
                 .attr("id", _.tag.c.topDiv)
                 .classed("lh_show", function() {
-                    console.log(!option.title.enable)
+                    // console.log(!option.title.enable)
                     return !option.title.enable
                 })
 
@@ -274,10 +328,9 @@
 
                 // _.tag.d.chartDiv = _.labelid
 
-                pie.isUpdate || init();
+                pie.isUpdate ? update() : init();
 
                 // init();
-
                 draw_pie()
 
                 return pie;
@@ -292,9 +345,11 @@
                 createTagForDom("chart_pie_g");
 
                 createTagForDom("pie_g");
+                createTagForDom("pie")
+
 
                 pie.tool.arc = d3.svg.arc()
-                    .innerRadius(pie.option.innerRadius)
+                    .innerRadius(pie.option.innerRadius > 1 ? pie.option.innerRadius : pie.option.innerRadius * pie.option.outerRadius)
                     .outerRadius(pie.option.outerRadius)
 
                 pie.tool.pie = d3.layout.pie()
@@ -307,21 +362,36 @@
                     .value(function(d) {
                         return pie.option.value(d)
                     })
-
-                width = "300px";
-
-                chart.chartSvg = d3.select("#" + _.tag.d.chartDiv)
-                    .append("svg")
-                    .attr("class", _.tag.c.chartSvg)
-                    .style("width", width)
-                    .style("height", width);
-
+                draw_svg()
                 chart.chart_pie_g = chart.chartSvg.append("g")
                     .attr("class", _.tag.c.chart_pie_g);
 
                 chart.pie_g = chart.chart_pie_g.append("g")
                     .attr("class", _.tag.c.pie_g);
-                _.isUpdate = true;
+
+                pie.isUpdate = true;
+            }
+
+            function update() {
+                draw_svg()
+            }
+
+            function draw_svg() {
+                // var width = "300px";
+                pie.width = _.selecter.div.chartDiv.style("width");
+                pie.heigh = _.selecter.div.chartDiv.style("height");
+                chart.chartSvg = _.selecter.div.chartDiv.selectAll("svg").data(['only']) //d3.select("#" + _.tag.d.chartDiv)
+                chart.chartSvg.enter()
+                    .append("svg")
+                    .attr("class", _.tag.c.chartSvg)
+                    .attr('id', _.tag.d.chartSvg)
+                    .style("width", pie.width)
+                    .style("height", pie.heigh);
+                chart.chartSvg
+                    .style("width", pie.width)
+                    .style("height", pie.heigh);
+                chart.chartSvg.exit().remove();
+
             }
 
             function draw_pie() {
@@ -341,16 +411,20 @@
                     .attr("fill", function(d) {
                         return color(pie.option.name(d.data));
                     })
-                    .attr("transform", "translate(150,150)")
+                    // .attr("transform", "translate(150,150)")
+                    .style("transform", "translate(calc(" + (pie.width) + "/ 2),calc(" + (pie.heigh) + " / 2))")
                     .on({
                         "mousemove": function(d, i) {
                             pie.option.event.mousemove.apply(pie, [d, i])
+                            pie.tip.show(pie.option.name(d.data), pie.option.value(d.data))
                         },
                         "mouseout": function(d, i) {
                             pie.option.event.mouseout.apply(pie, [d, i])
+                            pie.tip.hiddle()
                         },
                         "mouseover": function(d, i) {
                             pie.option.event.mouseover.apply(pie, [d, i])
+                            pie.tip.show(pie.option.name(d.data), pie.option.value(d.data))
                         }
                     })
 
@@ -361,8 +435,7 @@
                     .attr("fill", function(d) {
                         return color(pie.option.name(d.data));
                     })
-                    .attr("transform", "translate(150,150)")
-
+                    .style("transform", "translate(calc(" + (pie.width) + "/ 2),calc(" + (pie.heigh) + " / 2))")
                 chart.pie.exit().remove()
 
 
@@ -387,10 +460,49 @@
                         break;
                 }
             }
-
             return pie;
         }
 
+
+
+        /**
+         * 
+         * 深拷贝
+         * 
+         * @param {any} p 
+         * @param {any} c 
+         * @returns 
+         */
+        function deepCopy(p, c) {　　　　
+            var c = c || {};
+
+            function keyss(map) {
+                var keys = [];
+                for (var key in map) keys.push(key);
+                return keys;
+            };
+            if (!Array.isArray(p)) {
+
+                var keys = keyss(p);
+                for (var key in keys) {
+                    if (typeof p[keys[key]] == 'string' || typeof p[keys[key]] == 'number' || typeof p[keys[key]] == 'function') {
+                        c[keys[key]] = p[keys[key]];
+
+                    } else {
+                        c[keys[key]] = [];
+                        deepCopy(p[keys[key]], c[keys[key]])
+                    }
+
+
+                }　
+            } else {
+                for (var i in p) {　　　
+                    c[i] = {}
+                    deepCopy(p[i], c[i]);　
+                }　
+            }　　　　　　
+            return c;　　
+        }
 
         return _;
     }
