@@ -2,6 +2,11 @@
     display: none;
 }
 
+.tool_tip_d3_lh {
+    position: fixed;
+    pointer-events: none;
+}
+
 .c_parent_d3_lh {
     display: flex;
     flex-direction: column;

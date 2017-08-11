@@ -17,18 +17,21 @@
     function component_tooltip() {
         var tip = Object.create(lh);
         // tip.Bind = function() {
-
         // }
         // createTagForDom('tool_tip_d3_lh');
         // tip.dom = d3.selectAll('.tool_tip_d3_lh');
-        tip.dom = d3.select("body")
-            .append("div")
-            .attr("class", "tool_tip_d3_lh")
-            // selectAll(".tool_tip_d3_lh")
+        // tip.dom = d3.select("body")
+        // .append("div")
+        // .attr("class", "tool_tip_d3_lh")
+        // selectAll(".tool_tip_d3_lh")
 
-        tip.dom = function() {
-            return draw_tip();
-        }();
+        // tip.dom = function() {
+        //     var dom = draw_tip()
+        //     console.log(dom)
+        //     return dom;
+        // }();
+
+        draw_tip();
 
         /**
          * dom还未加载会导致失败；因此延迟执行确保tip——div创建；
@@ -36,14 +39,16 @@
          * @returns dom
          */
         function draw_tip() {
-            var dom = d3.select("body").append('div').attr("class", 'tool_tip_d3_lh');
-
+            // var dom = d3.select("body").append('div').attr("class", 'tool_tip_d3_lh');
+            var dom = d3.selectAll('.tool_tip_d3_lh');
             if (!!dom.node()) {
-                return dom;
+                return;
             } else {
+                tip.dom = d3.select("body").append("div").attr("class", 'tool_tip_d3_lh')
                 setTimeout(draw_tip, 1000);
             }
         }
+
         tip.Data = function(d) {
             tip._data = d;
             return tip;
@@ -51,11 +56,20 @@
         tip.test = function() {
             console.log("test");
         }
-        tip.show = function(name, value) {
-            console.log(name, value)
+        tip.show = function(name, value, arr) {
+            // console.log(name, value.d3.event)
+            this.dom
+                .style({
+                    "opacity": 1,
+                    "top": arr[1] + "px",
+                    "left": arr[0] + "px"
+                })
+                .html("" + name + ", " + (value) + "")
+
         }
         tip.hiddle = function() {
             console.log("hiddle")
+            this.dom.style("opacity", 0)
         }
         return tip;
     }
@@ -119,6 +133,13 @@
             legend: {
                 enable: true,
                 position: "e"
+            },
+            tip: {
+                enable: true
+                    // ,
+                    // event: {
+
+                // }
             }
         }
 
@@ -416,7 +437,11 @@
                     .on({
                         "mousemove": function(d, i) {
                             pie.option.event.mousemove.apply(pie, [d, i])
-                            pie.tip.show(pie.option.name(d.data), pie.option.value(d.data))
+                            console.log(d3.event, d3.mouse(d3.select("." + _.tag.c.chartDiv).node()))
+
+                            pie.tip.show(pie.option.name(d.data), pie.option.value(d.data), [d3.event.x, d3.event.y])
+                                // pie.tip.show(pie.option.name(d.data), pie.option.value(d.data), d3.mouse(d3.select("body").node()))
+                                // pie.tip.show(pie.option.name(d.data), pie.option.value(d.data), d3.mouse(d3.select("." + _.tag.c.chartDiv).node()))
                         },
                         "mouseout": function(d, i) {
                             pie.option.event.mouseout.apply(pie, [d, i])
@@ -424,7 +449,9 @@
                         },
                         "mouseover": function(d, i) {
                             pie.option.event.mouseover.apply(pie, [d, i])
-                            pie.tip.show(pie.option.name(d.data), pie.option.value(d.data))
+                            pie.tip.show(pie.option.name(d.data), pie.option.value(d.data), [d3.event.x, d3.event.y])
+                                // pie.tip.show(pie.option.name(d.data), pie.option.value(d.data), d3.mouse(d3.select("body").node()))
+                                // pie.tip.show(pie.option.name(d.data), pie.option.value(d.data), d3.mouse(d3.select("." + _.tag.c.chartDiv).node()))
                         }
                     })
 
